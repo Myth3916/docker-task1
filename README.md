@@ -6,44 +6,6 @@
 
 ---
 
-## 🔗 Ссылки
-
-| Задача | Ссылка |
-|--------|--------|
-| Репозиторий на GitHub | [ссылка](https://github.com/Myth3916/docker-task1) |
-| Docker Hub репозиторий | [myth3916/custom-nginx](https://hub.docker.com/r/myth3916/custom-nginx) |
-
----
-
-## ✅ Задача 1: Сборка и отправка образа custom-nginx
-
-### 🔹 Шаги выполнения:
-
-1. Установлен Docker и Docker Compose на Arch Linux:
-   ```bash
-   sudo pacman -S docker docker-compose-plugin
-   sudo systemctl enable --now docker
-   sudo usermod -aG docker $USER
-   ```
-
-Отличная идея, Олег! 📝 Давай оформим `README.md` — это важно для сдачи домашнего задания.
-
-Я подготовил для тебя **готовый шаблон** с правильным Markdown-разметкой. Ты можешь просто скопировать его, вставить свои скриншоты и данные.
-
----
-
-## 📄 Шаблон `README.md` для задания
-
-Создай файл `~/github/docker-task1/README.md` и вставь туда этот код:
-
-```markdown
-# Домашнее задание к занятию 4 «Оркестрация группой Docker контейнеров на примере Docker Compose»
-
-**Выполнил:** Шаров Олег  
-**Дата:** Май 2026  
-**Репозиторий:** [myth3916/docker-task1](https://github.com/Myth3916/docker-task1)
-
----
 
 ## 🔗 Ссылки
 
