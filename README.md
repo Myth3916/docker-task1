@@ -113,6 +113,7 @@ docker start custom-nginx-t2
 ### 🔹 Скриншоты:
 
 ![Attach и остановка](./screenshots/task3-attach-stop.png)
+
 *Рисунок 5: Подключение к контейнеру и остановка через Ctrl-C*
 
 ![Перезапуск контейнера](./screenshots/task3-restart.png)
