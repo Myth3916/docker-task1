@@ -2,16 +2,15 @@
 
 **Выполнил:** Шаров Олег  
 **Дата:** Май 2026  
-**Репозиторий:** [myth3916/docker-task1](https://github.com/Myth3916/docker-task1)
+**Репозиторий:** [Myth3916/docker-task1](https://github.com/Myth3916/docker-task1)
 
 ---
 
-
 ## 🔗 Ссылки
 
-| Задача | Ссылка |
+| Ресурс | Ссылка |
 |--------|--------|
-| Репозиторий на GitHub | [ссылка](https://github.com/Myth3916/docker-task1) |
+| Репозиторий на GitHub | [Myth3916/docker-task1](https://github.com/Myth3916/docker-task1) |
 | Docker Hub репозиторий | [myth3916/custom-nginx](https://hub.docker.com/r/myth3916/custom-nginx) |
 
 ---
@@ -20,32 +19,32 @@
 
 ### 🔹 Шаги выполнения:
 
-1. Установлен Docker и Docker Compose на Arch Linux:
+1. **Установка Docker на Arch Linux:**
    ```bash
    sudo pacman -S docker docker-compose-plugin
    sudo systemctl enable --now docker
    sudo usermod -aG docker $USER
    ```
 
-2. Создан `Dockerfile`:
+2. **Создан Dockerfile:**
    ```dockerfile
    FROM nginx:1.29.0
    COPY index.html /usr/share/nginx/html/index.html
    RUN chmod 644 /usr/share/nginx/html/index.html
    ```
 
-3. Собран образ:
+3. **Сборка образа:**
    ```bash
    docker build -t myth3916/custom-nginx:1.0.0 .
    ```
 
-4. Отправлен в Docker Hub:
+4. **Отправка в Docker Hub:**
    ```bash
    docker login
    docker push myth3916/custom-nginx:1.0.0
    ```
 
-### 🔹 Скриншоты:
+### 🔹 Скриншот:
 
 ![Docker Hub репозиторий](./screenshots/task1-dockerhub.png)
 *Рисунок 1: Образ custom-nginx:1.0.0 в Docker Hub*
@@ -56,60 +55,136 @@
 
 ### 🔹 Команды:
 
+**Запуск контейнера:**
 ```bash
-# Запуск контейнера
 docker run -d \
   --name Oleg-custom-nginx-t2 \
   -p 127.0.0.1:8080:80 \
   myth3916/custom-nginx:1.0.0
-
-# Переименование
-docker rename Oleg-custom-nginx-t2 custom-nginx-t2
-
-# Проверка
-curl http://127.0.0.1:8080
 ```
 
-### 🔹 Исправление прав доступа (403 Forbidden):
+**Переименование:**
+```bash
+docker rename Oleg-custom-nginx-t2 custom-nginx-t2
+```
 
+**Исправление прав доступа (403 Forbidden):**
 ```bash
 docker exec -u root custom-nginx-t2 chmod 644 /usr/share/nginx/html/index.html
 ```
 
+**Проверка доступности:**
+```bash
+curl http://127.0.0.1:8080
+```
+
 ### 🔹 Скриншоты:
 
-* Вывод команд запуска, переименования и проверки*
-![Запуск и проверка контейнера](./screenshots/task2-run-rename.png)
-![Запуск и проверка контейнера](./screenshots/task2-verify-check.png)
-![Запуск и проверка контейнера](./screenshots/task2-curl-check.png)
+![Запуск и переименование](./screenshots/task2-run-rename.png)
+*Рисунок 2: Запуск контейнера и переименование*
+
+![Проверочная команда](./screenshots/task2-verify-check.png)
+*Рисунок 3: Вывод команды date, docker ps, ss, logs, base64*
+
+![Проверка curl](./screenshots/task2-curl-check.png)
+*Рисунок 4: Проверка доступности страницы через curl*
 
 ---
 
-## 🔄 Задача 3: Работа с потоками и конфигурацией (в процессе)
+## ✅ Задача 3: Работа с потоками и конфигурацией
 
-### 🔹 Подключение к контейнеру:
+### 🔹 3.1. Подключение к стандартному потоку контейнера
 
+**Команды:**
 ```bash
-# Подключение к stdout/stdin
 docker attach custom-nginx-t2
-# Нажатие Ctrl-C останавливает контейнер, т.к. сигнал передаётся основному процессу (nginx)
-
-# Перезапуск
+# Нажатие Ctrl-C
+docker ps -a
 docker start custom-nginx-t2
-
-# Вход в интерактивный терминал
-docker exec -it custom-nginx-t2 bash
 ```
 
-### 🔹 Почему контейнер остановился после Ctrl-C?
+**Почему контейнер остановился после Ctrl-C?**
 
-> При использовании `docker attach` мы подключаемся к основному процессу контейнера. 
-> Нажатие `Ctrl-C` отправляет сигнал `SIGINT`, который nginx обрабатывает как команду на завершение работы.
-> Поэтому контейнер останавливается.
+> При использовании `docker attach` мы подключаемся к основному процессу контейнера (nginx). 
+> Нажатие `Ctrl-C` отправляет сигнал `SIGINT` (сигнал прерывания, код 2), который nginx 
+> обрабатывает как команду на завершение работы. Nginx корректно завершает все worker-процессы 
+> и останавливается, что приводит к остановке контейнера.
 
 ### 🔹 Скриншоты:
 
-![Attach и restart](./screenshots/task3-attach.png)
+![Attach и остановка](./screenshots/task3-attach-stop.png)
+*Рисунок 5: Подключение к контейнеру и остановка через Ctrl-C*
+
+![Перезапуск контейнера](./screenshots/task3-restart.png)
+*Рисунок 6: Перезапуск контейнера командой docker start*
+
+---
+
+### 🔹 3.2. Вход в контейнер и изменение конфигурации
+
+**Команды:**
+```bash
+docker exec -it custom-nginx-t2 bash
+apt-get update
+apt-get install -y nano
+nano /etc/nginx/conf.d/default.conf
+# Изменено: listen 80 → listen 81
+nginx -s reload
+curl http://127.0.0.1:80   # Ошибка подключения
+curl http://127.0.0.1:81   # Успешный ответ
+exit
+```
+
+### 🔹 Скриншот:
+
+![Редактирование конфига и reload](./screenshots/task3-nginx-reload.png)
+*Рисунок 7: Изменение порта nginx и проверка работы*
+
+---
+
+### 🔹 3.3. Проблема с портами
+
+**Проверка на хостовой машине:**
+```bash
+ss -tlpn | grep 127.0.0.1:8080
+docker port custom-nginx-t2
+curl http://127.0.0.1:8080
+```
+
+**Суть возникшей проблемы:**
+
+> При запуске контейнера был настроен проброс портов: `-p 127.0.0.1:8080:80`. 
+> Это означает: "всё, что приходит на порт хоста 8080, перенаправлять на порт контейнера 80".
+> 
+> После изменения конфигурации nginx внутри контейнера на `listen 81`, он перестал слушать 
+> порт 80. Docker продолжает пересылать трафик на порт 80, но там никто не слушает. 
+> В результате соединение сбрасывается с ошибкой "Recv failure: Соединение разорвано 
+> другой стороной".
+> 
+> **Решение:** нужно либо вернуть порт 80 в конфиге nginx, либо пересоздать контейнер с 
+> правильным маппингом портов (например, `-p 127.0.0.1:8080:81`).
+
+### 🔹 Скриншот:
+
+![Проблема с портами](./screenshots/task3-port-problem.png)
+*Рисунок 8: Демонстрация проблемы с портами*
+
+---
+
+### 🔹 3.4. Удаление работающего контейнера
+
+**Команда:**
+```bash
+docker rm -f custom-nginx-t2
+```
+
+**Объяснение:** Флаг `-f` (force) принудительно останавливает работающий контейнер 
+(отправляет SIGKILL) и затем удаляет его.
+
+### 🔹 Скриншот:
+
+![Удаление контейнера](./screenshots/task3-force-remove.png)
+*Рисунок 9: Принудительное удаление контейнера*
 
 ---
 
@@ -140,33 +215,23 @@ docker logs <container_name>
 # Вход в контейнер
 docker exec -it <container_name> bash
 
+# Подключение к потоку
+docker attach <container_name>
+
 # Очистка
 docker system prune -a
 ```
 
 ---
 
-> 💡 **Примечание:** Все скриншоты сохранены в папке `./screenshots/`
-```
+## 📚 Источники
+
+- [Docker Hub](https://hub.docker.com)
+- [Docker Documentation](https://docs.docker.com)
+- [Nginx Documentation](https://nginx.org/en/docs/)
 
 ---
 
-## 📁 Структура папки проекта
-
-Создай такую структуру:
-
-```
-~/github/docker-task1/
-├── README.md           # Этот файл
-├── Dockerfile          # Твой Dockerfile
-├── index.html          # Твой index.html
-└── screenshots/        # Папка для скриншотов
-    ├── task1-dockerhub.png
-    ├── task2-run-check.png
-    └── task3-attach.png
+> 💡 **Примечание:** Все скриншоты сохранены в папке `./screenshots/`
 ```
 
-### 🔹 Создай папку для скриншотов:
-```bash
-mkdir -p ~/github/docker-task1/screenshots
-```
