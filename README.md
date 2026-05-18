@@ -182,16 +182,160 @@ docker rm -f custom-nginx-t2
 *Рисунок 9: Принудительное удаление контейнера*
 
 ---
+---
 
-## ⏳ Задача 4: Общие тома (Volume) между контейнерами
+## ✅ Задача 4: Общие тома (Volume) между контейнерами
 
-*Выполняется...*
+### 🔹 Шаги выполнения:
+
+1. **Запуск CentOS контейнера:**
+   ```bash
+   docker run -d --name centos-vol -v $(pwd):/data centos:7 sleep 3600
+   ```
+
+2. **Запуск Debian контейнера:**
+   ```bash
+   docker run -d --name debian-vol -v $(pwd):/data debian:latest sleep 3600
+   ```
+
+3. **Создание файла в CentOS:**
+   ```bash
+   docker exec -it centos-vol bash -c "echo 'Hello from CentOS' > /data/from-centos.txt"
+   ```
+
+4. **Создание файла на хосте:**
+   ```bash
+   echo "Hello from Host" > from-host.txt
+   ```
+
+5. **Проверка в Debian:**
+   ```bash
+   docker exec -it debian-vol bash -c "ls -la /data && cat /data/from-centos.txt && cat /data/from-host.txt"
+   ```
+
+**Результат:** Оба файла (`from-centos.txt` и `from-host.txt`) видны в контейнере Debian, 
+что подтверждает работу общих томов.
+
+### 🔹 Скриншот:
+
+![Общие тома](./screenshots/task4-volumes.png)
+*Рисунок 9: Демонстрация общих томов между контейнерами*
 
 ---
 
-## ⏳ Задача 5: Docker Compose и Portainer
+## ✅ Задача 5: Docker Compose и Portainer
 
-*Выполняется...*
+### 🔹 5.1. Приоритет файлов Docker Compose
+
+**Вопрос:** Какой из файлов был запущен и почему?
+
+**Ответ:** Запустился файл `compose.yaml`, так как Docker Compose следует приоритету файлов:
+1. `compose.yaml` (наивысший приоритет) ✅
+2. `compose.yml`
+3. `docker-compose.yaml`
+4. `docker-compose.yml`
+
+При наличии нескольких файлов используется первый по приоритету.
+
+### 🔹 5.2. Запуск обоих сервисов
+
+Для запуска обоих сервисов (portainer и registry) добавлена директива `include`:
+
+```yaml
+# compose.yaml
+services:
+  portainer:
+    network_mode: host
+    image: portainer/portainer-ce:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+include:
+  - docker-compose.yaml
+```
+
+### 🔹 5.3. Загрузка образа в локальный Registry
+
+**Настройка insecure-registry:**
+
+```bash
+# Создание /etc/docker/daemon.json
+{
+  "registry-mirrors": ["https://mirror.gcr.io"],
+  "insecure-registries": ["127.0.0.1:5000"]
+}
+
+# Перезапуск Docker
+sudo systemctl restart docker
+```
+
+**Тегирование и загрузка:**
+```bash
+docker tag myth3916/custom-nginx:1.0.0 127.0.0.1:5000/custom-nginx:latest
+docker push 127.0.0.1:5000/custom-nginx:latest
+```
+
+### 🔹 5.4. Развёртывание стека в Portainer
+
+1. Открыт Portainer: `http://127.0.0.1:9000`
+2. Создан пользователь admin
+3. Выбрано локальное окружение
+4. Через **Stacks → Add stack → Web editor** задеплоен стек:
+
+```yaml
+version: '3'
+services:
+  nginx:
+    image: 127.0.0.1:5000/custom-nginx
+    ports:
+      - "9090:80"
+```
+
+### 🔹 Скриншоты:
+
+![Запуск обоих сервисов](./screenshots/task5-both-services.png)
+*Рисунок 10: Запуск portainer и registry через docker compose*
+
+![Push в локальный registry](./screenshots/task5-push-registry.png)
+*Рисунок 11: Загрузка образа в локальный registry*
+
+![Portainer с задеплоенным стеком](./screenshots/task5-portainer-stack.png)
+*Рисунок 12: Стек custom-nginx-stack в Portainer*
+
+![Inspect контейнера](./screenshots/task5-inspect.png)
+*Рисунок 13: Inspect контейнера (Config секция)*
+
+---
+
+### 🔹 5.5. Удаление манифеста и warning
+
+**Удаление файла:**
+```bash
+rm compose.yaml
+docker compose up -d
+```
+
+**Warning:**
+```
+WARN[0000] Found orphan containers ([task5-portainer-1]) for this project. 
+If you removed or renamed this service in your compose file, you can run 
+this command with the --remove-orphans flag to clean it up.
+```
+
+**Объяснение:** Docker Compose обнаружил контейнер `task5-portainer-1`, 
+который был запущен ранее, но больше не описан в конфигурационных файлах. 
+Такие контейнеры называются **orphan** («сироты»).
+
+**Очистка:**
+```bash
+docker compose up -d --remove-orphans
+docker compose down
+```
+
+### 🔹 Скриншот:
+
+![Warning и очистка orphan containers](./screenshots/task5-warning.png)
+*Рисунок 14: Warning про orphan containers и очистка проекта*
 
 ---
 
