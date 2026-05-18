@@ -1,7 +1,7 @@
 # Домашнее задание к занятию 4 «Оркестрация группой Docker контейнеров на примере Docker Compose»
 
 **Выполнил:** Шаров Олег  
-**Дата:** Май 2026  
+ 
 **Репозиторий:** [Myth3916/docker-task1](https://github.com/Myth3916/docker-task1)
 
 ---
@@ -181,7 +181,6 @@ docker rm -f custom-nginx-t2
 ![Удаление контейнера](./screenshots/task3-force-remove.png)
 *Рисунок 9: Принудительное удаление контейнера*
 
----
 ---
 
 ## ✅ Задача 4: Общие тома (Volume) между контейнерами
@@ -363,14 +362,5 @@ docker system prune -a
 
 ---
 
-## 📚 Источники
-
-- [Docker Hub](https://hub.docker.com)
-- [Docker Documentation](https://docs.docker.com)
-- [Nginx Documentation](https://nginx.org/en/docs/)
-
----
-
 > 💡 **Примечание:** Все скриншоты сохранены в папке `./screenshots/`
 ```
-
